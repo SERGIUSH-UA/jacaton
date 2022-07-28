@@ -5,8 +5,9 @@ let chai = require('chai');
 let chaiHttp = require('chai-http');
 let server = require('../index');
 const {Answer, User, Question, Team, Game} = require("../models/models");
+const path = require("path");
 let should = chai.should();
-
+let expect = chai.expect;
 
 chai.use(chaiHttp);
 
@@ -265,7 +266,7 @@ describe('Global /API',  () => {
         });
         it('/ it should POST, then GET by ID, then Patch and Delete by ID, check Deleting must be Success', async () => {
             await request(server)
-                .post('/api/team').send({name: 'Test 2', city: 'Kyiv', img: './static/img/img.jpg',
+                .post('/api/team').send({name: 'Test 2', city: 'Kyiv',
                     parish: 'Матері Божої Ангельської'})
                 .then(async (res) => {
                     res.should.have.status(200);
@@ -460,14 +461,15 @@ describe('SIMULATE USER ACTIVITY',  () => {
                                     resB.should.have.status(200);
                                     resB.body.should.be.a('object');
                                     resB.body.city.should.be.eql('Вінниця');
-                                    await request(server).delete(`/api/team/${id}`).send()
+                                    await request(server).patch(`/api/team/${id}`).attach('img',
+                                        path.resolve(__dirname,'files/logo.png'))
                                         .then(async (resC) => {
                                             resC.should.have.status(200);
                                             resC.body.should.be.a('object');
-                                            resC.body.message.should.be.eql(true);
+                                            expect(resC.body.img).to.not.be.empty;
                                             await request(server).get(`/api/team/${id}`)
                                                 .then(async (resD) => {
-                                                    resD.should.have.status(204);
+                                                    resD.should.have.status(200);
                                                 })
                                         })
                                 })
@@ -517,6 +519,33 @@ describe('SIMULATE USER ACTIVITY',  () => {
                                         })
                                 })
                         })
+                }).catch((e) => {throw e});
+        });
+        it('/ it should check limit Success', async () => {
+            await request(server)
+                .post('/api/answer').send({body: 'Test'})
+                .then(async (res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    await request(server)
+                        .post('/api/answer').send({body: 'Test 2'}).then(
+                            async (resB) => {
+                                await request(server)
+                                    .get('/api/answer')
+                                    .then(async (res) => {
+                                        res.should.have.status(200);
+                                        res.body.should.be.a('array');
+                                        res.body.length.should.be.eql(2);
+                                        await request(server)
+                                            .get('/api/answer?limit=1')
+                                            .then((res) => {
+                                                res.should.have.status(200);
+                                                res.body.should.be.a('array');
+                                                res.body.length.should.be.eql(1);
+                                            }).catch((e) => {throw e});
+                                    }).catch((e) => {throw e});
+                            }
+                        )
                 }).catch((e) => {throw e});
         });
     });

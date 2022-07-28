@@ -4,7 +4,11 @@ const ApiError = require("../error/ApiError");
 class AnswerController {
 
     async getAll(req, res, next) {
-        const answers = await Answer.findAll()
+        let {page, limit} = req.query
+        page = page || 1
+        limit = limit || 200
+        let offset = (page - 1) * limit
+        const answers = await Answer.findAll({limit, offset})
         return res.status(200).json(answers)
     }
 

@@ -1,3 +1,5 @@
+const uuid = require('uuid')
+const path = require('path')
 const {Team} = require("../models/models");
 const ApiError = require("../error/ApiError");
 
@@ -22,8 +24,14 @@ class TeamController {
 
     async add(req, res, next) {
         try {
-            const {name, city, img, parish, captainId} = req.body
-            const team = await Team.create({name, city, img, parish, captainId})
+            const {name, city, parish, captainId} = req.body
+            let fileName = ''
+            if (req.files) {
+                const {img} = req.files
+                fileName =uuid.v4() + ".jpg"
+                await img.mv(path.resolve(__dirname, '..', 'static', fileName))
+            }
+            const team = await Team.create({name, city, img: fileName, parish, captainId})
             return res.status(200).json(team)
         }
         catch(e){
@@ -40,6 +48,14 @@ class TeamController {
             const team = await Team.findByPk(id)
             await team.set(req.body)
             await team.save();
+            if (req.files) {
+                const {img} = req.files
+                let fileName =uuid.v4() + ".jpg"
+                await img.mv(path.resolve(__dirname, '..', 'static', fileName))
+                await team.set({img: fileName})
+                await team.save();
+                return res.status(200).json(team)
+            }
             return res.status(200).json(team)
         }
         catch(e){
