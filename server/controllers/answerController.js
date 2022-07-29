@@ -8,7 +8,7 @@ class AnswerController {
         page = page || 1
         limit = limit || 200
         let offset = (page - 1) * limit
-        const answers = await Answer.findAll({limit, offset})
+        const answers = await Answer.findAndCountAll({limit, offset})
         return res.status(200).json(answers)
     }
 

@@ -83,40 +83,46 @@ describe('Global /API',  () => {
 
     describe('/USER',  () => {
         const request =  chai.request;
+        let token = '';
         it('/AUTH it should GET check Wrong   400 error', async () => {
             await request(server)
                 .get('/api/user/auth')
                 .then((res) => {
-                    res.should.have.status(400);
+                    res.should.have.status(401);
                     res.body.should.be.a('object');
-                    res.body.message.should.be.eql('ID is required');
-                }).catch((e) => {throw e});
-        });
-        it('/AUTH?id=5 it should GET check Success', async () => {
-            await request(server)
-                .get('/api/user/auth?id=5')
-                .then((res) => {
-                    res.should.have.status(200);
-                    res.body.should.be.a('object');
-                    res.body.message.should.be.eql(true);
+                    res.body.message.should.be.eql('Не авторизовано!');
                 }).catch((e) => {throw e});
         });
         it('/REGISTRATION it should POST check Success', async () => {
             await request(server)
-                .post('/api/user/registration')
+                .post('/api/user/registration').send({email:'testin@g.com',
+                    password:"1234321", role: 'user'})
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
-                    res.body.message.should.be.eql(true);
+                    res.body.token.should.be.a('string');
                 }).catch((e) => {throw e});
         });
         it('/LOGIN it should POST check Success', async () => {
             await request(server)
-                .post('/api/user/login')
+                .post('/api/user/login').send({email:'testin@g.com',
+                    password:"1234321"})
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
-                    res.body.message.should.be.eql(true);
+                    res.body.token.should.be.a('string');
+                    res.body.token.should.not.empty;
+                    token = res.body.token
+                }).catch((e) => {throw e});
+        });
+        it('/AUTH?id=1 it should GET check Success', async () => {
+            await request(server)
+                .get('/api/user/auth?id=5').set({ authorization: `Bearer ${token}`})
+                .then((res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.token.should.be.a('string');
+                    res.body.token.should.not.empty;
                 }).catch((e) => {throw e});
         });
     });
@@ -217,7 +223,7 @@ describe('Global /API',  () => {
                 .get('/api/answer')
                 .then((res) => {
                     res.should.have.status(200);
-                    res.body.should.be.a('array');
+                    res.body.rows.should.be.a('array');
                 }).catch((e) => {throw e});
         });
         it('/ it should POST, then GET by ID, then Patch and Delete by ID, check Deleting must be Success', async () => {
@@ -309,49 +315,63 @@ describe('SIMULATE USER ACTIVITY',  () => {
 
     describe('ACCOUNT',  () => {
         const request =  chai.request;
+        let token = ''
         it('REGISTRATION check Error', async () => {
             await request(server)
-                .post('/api/user/registration')
+                .post('/api/user/registration').send({email:'test@g.com'})
                 .then((res) => {
                     res.should.not.status(200);
                     res.body.should.be.a('object');
-                    res.body.message.should.be.eql(false);
+                    res.body.message.should.be.a('string');
                 }).catch((e) => {throw e});
         });
         it('REGISTRATION check Success', async () => {
             await request(server)
-                .post('/api/user/registration')
+                .post('/api/user/registration').send({email:'test@g.com',
+                    password:"1234321", role: 'user'})
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
-                    res.body.message.should.be.eql(true);
+                    res.body.token.should.be.a('string');
                 }).catch((e) => {throw e});
         });
-        it('/LOGIN it should POST check Error', async () => {
+        it('/LOGIN it should POST check Wrong Email', async () => {
             await request(server)
-                .post('/api/user/login')
+                .post('/api/user/login').send({email:"test1@g.com", password:"1111"})
                 .then((res) => {
                     res.should.not.status(200);
                     res.body.should.be.a('object');
-                    res.body.message.should.be.eql(false);
+                    res.body.message.should.be.eql('Користувач з таким емейлом не існує!');
+                }).catch((e) => {throw e});
+        });
+        it('/LOGIN it should POST check Wrong Password', async () => {
+            await request(server)
+                .post('/api/user/login').send({email:"test@g.com", password:"1111"})
+                .then((res) => {
+                    res.should.not.status(200);
+                    res.body.should.be.a('object');
+                    res.body.message.should.be.eql('Пароль не вірний!');
                 }).catch((e) => {throw e});
         });
         it('/LOGIN it should POST check Success', async () => {
             await request(server)
-                .post('/api/user/login')
+                .post('/api/user/login').send({email:"test@g.com", password:"1234321"})
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
-                    res.body.message.should.be.eql(true);
+                    res.body.token.should.be.a('string');
+                    res.body.token.should.not.empty;
+                    token = res.body.token
                 }).catch((e) => {throw e});
         });
-        it('/AUTH?id=1 it should GET check Success', async () => {
+        it('/AUTH it should GET check Success', async () => {
             await request(server)
-                .get('/api/user/auth?id=1')
+                .get('/api/user/auth').set({authorization: `Bearer ${token}`})
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
-                    res.body.message.should.be.eql(true);
+                    res.body.token.should.be.a('string');
+                    res.body.token.should.not.empty;
                 }).catch((e) => {throw e});
         });
 
@@ -486,7 +506,7 @@ describe('SIMULATE USER ACTIVITY',  () => {
                 .get('/api/answer')
                 .then((res) => {
                     res.should.have.status(200);
-                    res.body.should.be.a('array');
+                    res.body.rows.should.be.a('array');
                 }).catch((e) => {throw e});
         });
         it('/ it should POST, then GET by ID, then Patch and Delete by ID, check Deleting must be Success', async () => {
@@ -534,14 +554,14 @@ describe('SIMULATE USER ACTIVITY',  () => {
                                     .get('/api/answer')
                                     .then(async (res) => {
                                         res.should.have.status(200);
-                                        res.body.should.be.a('array');
-                                        res.body.length.should.be.eql(2);
+                                        res.body.rows.should.be.a('array');
+                                        res.body.rows.length.should.be.eql(2);
                                         await request(server)
                                             .get('/api/answer?limit=1')
                                             .then((res) => {
                                                 res.should.have.status(200);
-                                                res.body.should.be.a('array');
-                                                res.body.length.should.be.eql(1);
+                                                res.body.rows.should.be.a('array');
+                                                res.body.rows.length.should.be.eql(1);
                                             }).catch((e) => {throw e});
                                     }).catch((e) => {throw e});
                             }
