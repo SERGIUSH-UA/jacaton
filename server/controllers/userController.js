@@ -11,9 +11,29 @@ const generateJWT = (id, email, role) => {
         {expiresIn: '24h'})
 }
 
+const addRole = async (user, role) => {
+    let userRoles = user.role.split(';')
+    if (!userRoles.includes(role)){
+        userRoles.push(role)
+        user.role = userRoles.join(';')
+    }
+    await User.update({role: user.role}, {where: {id: user.id}})
+}
+
+const removeRole = async (user, role) => {
+    let userRoles = user.role.split(';')
+    const newUserRoles = userRoles.filter((roleAr) => roleAr !== role)
+    await User.update({role: newUserRoles}, {where: {id: user.id}})
+}
+
+const haveRole = (user, role) => {
+    let userRoles = user.role.split(';')
+    return userRoles.includes(role)
+}
+
 class UserController {
     async registration(req, res, next) {
-        const {email, password, role} = req.body
+        const {email, password} = req.body
         if (!email || !password){
             return next(ApiError.badRequest('Логін або пароль пусті!'))
         }
@@ -23,6 +43,11 @@ class UserController {
         }
         const hashPassword = await bcrypt.hash(password, 5)
         const name = uuid.v4();
+        let role = 'USER'
+        const users = await User.findAll()
+        if(users.length === 0){
+            role = 'USER;CAPTAIN;ADMIN'
+        }
         const user = await User.create({email, role, password: hashPassword, name})
         const token = generateJWT(user.id, user.email, user.role)
         res.status(200).json({token})
@@ -48,6 +73,22 @@ class UserController {
     async checkAuth(req, res, next) {
         const token = generateJWT(req.user.id, req.user.email, req.user.role)
         res.status(200).json({token})
+    }
+
+    async updateRole(req, res, next) {
+        const {userID, roles} = req.body
+        let user = req.user
+        try{
+            if(userID) {
+                user = await User.findByPk(userID)
+            }
+            for await (const role of roles) {
+                await addRole(user, role, next)
+            }
+            res.status(200).json({role:user.role})
+        } catch (e) {
+            return next(ApiError.internal(e.message))
+        }
     }
 
     async delete(req, res) {

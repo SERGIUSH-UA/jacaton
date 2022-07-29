@@ -6,9 +6,11 @@ let chaiHttp = require('chai-http');
 let server = require('../index');
 const {Answer, User, Question, Team, Game} = require("../models/models");
 const path = require("path");
+const jwt = require("jsonwebtoken");
 let should = chai.should();
 let expect = chai.expect;
-
+let adminToken = ''
+let userToken = ''
 chai.use(chaiHttp);
 
 console.log('API tests starting....')
@@ -81,9 +83,10 @@ describe('Global /API',  () => {
         })
     });
 
+    let token = '';
+
     describe('/USER',  () => {
         const request =  chai.request;
-        let token = '';
         it('/AUTH it should GET check Wrong   400 error', async () => {
             await request(server)
                 .get('/api/user/auth')
@@ -113,6 +116,7 @@ describe('Global /API',  () => {
                     res.body.token.should.be.a('string');
                     res.body.token.should.not.empty;
                     token = res.body.token
+                    adminToken = res.body.token
                 }).catch((e) => {throw e});
         });
         it('/AUTH?id=1 it should GET check Success', async () => {
@@ -131,7 +135,7 @@ describe('Global /API',  () => {
         const request =  chai.request;
         it('/ it should GET check Success', async () => {
             await request(server)
-                .get('/api/game')
+                .get('/api/game').set({ authorization: `Bearer ${token}`})
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('array');
@@ -139,24 +143,24 @@ describe('Global /API',  () => {
         });
         it('/ it should POST, then GET by ID, then Close and Delete by ID, check Deleting must be Success', async () => {
             await request(server)
-                .post('/api/game').send()
+                .post('/api/game').set({ authorization: `Bearer ${token}`}).send()
                 .then(async (res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
                     res.body.id.should.be.a('number');
                     const id = res.body.id;
-                    await request(server).get(`/api/game/${id}`)
+                    await request(server).get(`/api/game/${id}`).set({ authorization: `Bearer ${token}`})
                         .then(async (resA) => {
                             resA.should.have.status(200);
                             resA.body.should.be.a('object');
                             resA.body.id.should.be.eql(id);
                             resA.body.active.should.be.eql(true);
-                            await request(server).patch(`/api/game/close/${id}`).send()
+                            await request(server).patch(`/api/game/close/${id}`).set({ authorization: `Bearer ${token}`}).send()
                                 .then(async (resB) => {
                                     resB.should.have.status(200);
                                     resB.body.should.be.a('object');
                                     resB.body.message.should.be.eql('Game closed!');
-                                    await request(server).delete(`/api/game/${id}`).send()
+                                    await request(server).delete(`/api/game/${id}`).set({ authorization: `Bearer ${token}`}).send()
                                         .then(async (resC) => {
                                             resC.should.have.status(200);
                                             resC.body.should.be.a('object');
@@ -176,7 +180,7 @@ describe('Global /API',  () => {
         const request =  chai.request;
         it('/ it should GET check Success', async () => {
             await request(server)
-                .get('/api/question')
+                .get('/api/question').set({ authorization: `Bearer ${token}`})
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('array');
@@ -184,23 +188,26 @@ describe('Global /API',  () => {
         });
         it('/ it should POST, then GET by ID, then Patch and Delete by ID, check Deleting must be Success', async () => {
             await request(server)
-                .post('/api/question').send({title: 'Test', description: 'Test descr', answer: 'tEsT'})
+                .post('/api/question').set({ authorization: `Bearer ${token}`})
+                .send({title: 'Test', description: 'Test descr', answer: 'tEsT'})
                 .then(async (res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
                     res.body.id.should.be.a('number');
                     const id = res.body.id;
-                    await request(server).get(`/api/question/${id}`)
+                    await request(server).get(`/api/question/${id}`).set({ authorization: `Bearer ${token}`})
                         .then(async (resA) => {
                             resA.should.have.status(200);
                             resA.body.should.be.a('object');
                             resA.body.id.should.be.eql(id);
-                            await request(server).patch(`/api/question/${id}`).send({description: 'Test descr patch'})
+                            await request(server).patch(`/api/question/${id}`).set({ authorization: `Bearer ${token}`})
+                                .send({description: 'Test descr patch'})
                                 .then(async (resB) => {
                                     resB.should.have.status(200);
                                     resB.body.should.be.a('object');
                                     resB.body.description.should.be.eql('Test descr patch');
-                                    await request(server).delete(`/api/question/${id}`).send()
+                                    await request(server).delete(`/api/question/${id}`).set({ authorization: `Bearer ${token}`})
+                                        .send()
                                         .then(async (resC) => {
                                             resC.should.have.status(200);
                                             resC.body.should.be.a('object');
@@ -220,7 +227,7 @@ describe('Global /API',  () => {
         const request =  chai.request;
         it('/ it should GET check Success', async () => {
             await request(server)
-                .get('/api/answer')
+                .get('/api/answer').set({ authorization: `Bearer ${token}`})
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.rows.should.be.a('array');
@@ -228,28 +235,32 @@ describe('Global /API',  () => {
         });
         it('/ it should POST, then GET by ID, then Patch and Delete by ID, check Deleting must be Success', async () => {
             await request(server)
-                .post('/api/answer').send({body: 'Test'})
+                .post('/api/answer').set({ authorization: `Bearer ${token}`})
+                .send({body: 'Test'})
                 .then(async (res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
                     res.body.id.should.be.a('number');
                     const id = res.body.id;
-                    await request(server).get(`/api/answer/${id}`)
+                    await request(server).get(`/api/answer/${id}`).set({ authorization: `Bearer ${token}`})
                         .then(async (resA) => {
                             resA.should.have.status(200);
                             resA.body.should.be.a('object');
                             resA.body.id.should.be.eql(id);
-                            await request(server).patch(`/api/answer/${id}`).send({body: 'Test descr patch'})
+                            await request(server).patch(`/api/answer/${id}`).set({ authorization: `Bearer ${token}`})
+                                .send({body: 'Test descr patch'})
                                 .then(async (resB) => {
                                     resB.should.have.status(200);
                                     resB.body.should.be.a('object');
                                     resB.body.body.should.be.eql('Test descr patch');
-                                    await request(server).delete(`/api/answer/${id}`).send()
+                                    await request(server).delete(`/api/answer/${id}`)
+                                        .set({ authorization: `Bearer ${token}`}).send()
                                         .then(async (resC) => {
                                             resC.should.have.status(200);
                                             resC.body.should.be.a('object');
                                             resC.body.message.should.be.eql(true);
                                             await request(server).get(`/api/answer/${id}`)
+                                                .set({ authorization: `Bearer ${token}`})
                                                 .then(async (resD) => {
                                                     resD.should.have.status(204);
                                                 })
@@ -265,6 +276,7 @@ describe('Global /API',  () => {
         it('/ it should GET check Success', async () => {
             await request(server)
                 .get('/api/team')
+                .set({ authorization: `Bearer ${token}`})
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('array');
@@ -272,7 +284,9 @@ describe('Global /API',  () => {
         });
         it('/ it should POST, then GET by ID, then Patch and Delete by ID, check Deleting must be Success', async () => {
             await request(server)
-                .post('/api/team').send({name: 'Test 2', city: 'Kyiv',
+                .post('/api/team')
+                .set({ authorization: `Bearer ${token}`})
+                .send({name: 'Test 2', city: 'Kyiv',
                     parish: 'Матері Божої Ангельської'})
                 .then(async (res) => {
                     res.should.have.status(200);
@@ -284,12 +298,18 @@ describe('Global /API',  () => {
                             resA.should.have.status(200);
                             resA.body.should.be.a('object');
                             resA.body.id.should.be.eql(id);
-                            await request(server).patch(`/api/team/${id}`).send({city: 'Вінниця'})
+                            await request(server)
+                                .patch(`/api/team/${id}`)
+                                .set({ authorization: `Bearer ${token}`})
+                                .send({city: 'Вінниця'})
                                 .then(async (resB) => {
                                     resB.should.have.status(200);
                                     resB.body.should.be.a('object');
                                     resB.body.city.should.be.eql('Вінниця');
-                                    await request(server).delete(`/api/team/${id}`).send()
+                                    await request(server)
+                                        .delete(`/api/team/${id}`)
+                                        .set({ authorization: `Bearer ${token}`})
+                                        .send()
                                         .then(async (resC) => {
                                             resC.should.have.status(200);
                                             resC.body.should.be.a('object');
@@ -312,10 +332,10 @@ describe('SIMULATE USER ACTIVITY',  () => {
     before(  (done) => { //Before test we must run server!
         done()
     });
-
+    let token = ''
+    let userID = ''
     describe('ACCOUNT',  () => {
         const request =  chai.request;
-        let token = ''
         it('REGISTRATION check Error', async () => {
             await request(server)
                 .post('/api/user/registration').send({email:'test@g.com'})
@@ -362,8 +382,10 @@ describe('SIMULATE USER ACTIVITY',  () => {
                     res.body.token.should.be.a('string');
                     res.body.token.should.not.empty;
                     token = res.body.token
+                    userID = jwt.verify(token, process.env.SECRET_KEY).id
                 }).catch((e) => {throw e});
         });
+
         it('/AUTH it should GET check Success', async () => {
             await request(server)
                 .get('/api/user/auth').set({authorization: `Bearer ${token}`})
@@ -372,6 +394,29 @@ describe('SIMULATE USER ACTIVITY',  () => {
                     res.body.should.be.a('object');
                     res.body.token.should.be.a('string');
                     res.body.token.should.not.empty;
+                }).catch((e) => {throw e});
+        });
+        it('/ROLE it should PATCH Add role check Success', async () => {
+            await request(server)
+                .patch('/api/user/role')
+                .set({authorization: `Bearer ${adminToken}`})
+                .send({userID, roles:['ADMIN', 'CAPTAIN']})
+                .then((res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.role.should.be.a('string');
+                    res.body.role.should.not.empty;
+                }).catch((e) => {throw e});
+        });
+        it('/LOGIN (Re-login) it should POST check Success', async () => {
+            await request(server)
+                .post('/api/user/login').send({email:"test@g.com", password:"1234321"})
+                .then((res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.token.should.be.a('string');
+                    res.body.token.should.not.empty;
+                    token = res.body.token
                 }).catch((e) => {throw e});
         });
 
@@ -390,7 +435,8 @@ describe('SIMULATE USER ACTIVITY',  () => {
         });
         it('Create and check game', async () => {
             await request(server)
-                .post('/api/game').send()
+                .post('/api/game')
+                .set({ authorization: `Bearer ${token}`}).send()
                 .then(async (res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
@@ -419,23 +465,33 @@ describe('SIMULATE USER ACTIVITY',  () => {
         });
         it('/ it should POST, then GET by ID, then Patch and Delete by ID, check Deleting must be Success', async () => {
             await request(server)
-                .post('/api/question').send({title: 'Test', description: 'Test descr', answer: 'tEsT'})
+                .post('/api/question')
+                .set({ authorization: `Bearer ${token}`})
+                .send({title: 'Test', description: 'Test descr', answer: 'tEsT'})
                 .then(async (res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
                     res.body.id.should.be.a('number');
                     const id = res.body.id;
-                    await request(server).get(`/api/question/${id}`)
+                    await request(server)
+                        .get(`/api/question/${id}`)
+                        .set({ authorization: `Bearer ${token}`})
                         .then(async (resA) => {
                             resA.should.have.status(200);
                             resA.body.should.be.a('object');
                             resA.body.id.should.be.eql(id);
-                            await request(server).patch(`/api/question/${id}`).send({description: 'Test descr patch'})
+                            await request(server)
+                                .patch(`/api/question/${id}`)
+                                .set({ authorization: `Bearer ${token}`})
+                                .send({description: 'Test descr patch'})
                                 .then(async (resB) => {
                                     resB.should.have.status(200);
                                     resB.body.should.be.a('object');
                                     resB.body.description.should.be.eql('Test descr patch');
-                                    await request(server).delete(`/api/question/${id}`).send()
+                                    await request(server)
+                                        .delete(`/api/question/${id}`)
+                                        .set({ authorization: `Bearer ${token}`})
+                                        .send()
                                         .then(async (resC) => {
                                             resC.should.have.status(200);
                                             resC.body.should.be.a('object');
@@ -457,6 +513,7 @@ describe('SIMULATE USER ACTIVITY',  () => {
         it('/ it should GET check Success', async () => {
             await request(server)
                 .get('/api/team')
+                .set({ authorization: `Bearer ${token}`})
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('array');
@@ -464,30 +521,41 @@ describe('SIMULATE USER ACTIVITY',  () => {
         });
         it('/ it should POST, then GET by ID, then Patch and Delete by ID, check Deleting must be Success', async () => {
             await request(server)
-                .post('/api/team').send({name: 'Test 2', city: 'Kyiv', img: './static/img/img.jpg',
+                .post('/api/team')
+                .set({ authorization: `Bearer ${token}`})
+                .send({name: 'Test 2', city: 'Kyiv', img: './static/img/img.jpg',
                     parish: 'Матері Божої Ангельської'})
                 .then(async (res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
                     res.body.id.should.be.a('number');
                     const id = res.body.id;
-                    await request(server).get(`/api/team/${id}`)
+                    await request(server)
+                        .get(`/api/team/${id}`)
+                        .set({ authorization: `Bearer ${token}`})
                         .then(async (resA) => {
                             resA.should.have.status(200);
                             resA.body.should.be.a('object');
                             resA.body.id.should.be.eql(id);
-                            await request(server).patch(`/api/team/${id}`).send({city: 'Вінниця'})
+                            await request(server)
+                                .patch(`/api/team/${id}`)
+                                .set({ authorization: `Bearer ${token}`})
+                                .send({city: 'Вінниця'})
                                 .then(async (resB) => {
                                     resB.should.have.status(200);
                                     resB.body.should.be.a('object');
                                     resB.body.city.should.be.eql('Вінниця');
-                                    await request(server).patch(`/api/team/${id}`).attach('img',
-                                        path.resolve(__dirname,'files/logo.png'))
+                                    await request(server)
+                                        .patch(`/api/team/${id}`)
+                                        .set({ authorization: `Bearer ${token}`})
+                                        .attach('img', path.resolve(__dirname,'files/logo.png'))
                                         .then(async (resC) => {
                                             resC.should.have.status(200);
                                             resC.body.should.be.a('object');
                                             expect(resC.body.img).to.not.be.empty;
-                                            await request(server).get(`/api/team/${id}`)
+                                            await request(server)
+                                                .get(`/api/team/${id}`)
+                                                .set({ authorization: `Bearer ${token}`})
                                                 .then(async (resD) => {
                                                     resD.should.have.status(200);
                                                 })
@@ -504,6 +572,7 @@ describe('SIMULATE USER ACTIVITY',  () => {
         it('/ it should GET check Success', async () => {
             await request(server)
                 .get('/api/answer')
+                .set({ authorization: `Bearer ${token}`})
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.rows.should.be.a('array');
@@ -511,28 +580,39 @@ describe('SIMULATE USER ACTIVITY',  () => {
         });
         it('/ it should POST, then GET by ID, then Patch and Delete by ID, check Deleting must be Success', async () => {
             await request(server)
-                .post('/api/answer').send({body: 'Test'})
+                .post('/api/answer')
+                .set({ authorization: `Bearer ${token}`})
+                .send({body: 'Test'})
                 .then(async (res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
                     res.body.id.should.be.a('number');
                     const id = res.body.id;
-                    await request(server).get(`/api/answer/${id}`)
+                    await request(server)
+                        .get(`/api/answer/${id}`)
+                        .set({ authorization: `Bearer ${token}`})
                         .then(async (resA) => {
                             resA.should.have.status(200);
                             resA.body.should.be.a('object');
                             resA.body.id.should.be.eql(id);
-                            await request(server).patch(`/api/answer/${id}`).send({body: 'Test descr patch'})
+                            await request(server)
+                                .patch(`/api/answer/${id}`)
+                                .set({ authorization: `Bearer ${token}`})
+                                .send({body: 'Test descr patch'})
                                 .then(async (resB) => {
                                     resB.should.have.status(200);
                                     resB.body.should.be.a('object');
                                     resB.body.body.should.be.eql('Test descr patch');
-                                    await request(server).delete(`/api/answer/${id}`).send()
+                                    await request(server)
+                                        .delete(`/api/answer/${id}`).send()
+                                        .set({ authorization: `Bearer ${token}`})
                                         .then(async (resC) => {
                                             resC.should.have.status(200);
                                             resC.body.should.be.a('object');
                                             resC.body.message.should.be.eql(true);
-                                            await request(server).get(`/api/answer/${id}`)
+                                            await request(server)
+                                                .get(`/api/answer/${id}`)
+                                                .set({ authorization: `Bearer ${token}`})
                                                 .then(async (resD) => {
                                                     resD.should.have.status(204);
                                                 })
@@ -543,21 +623,27 @@ describe('SIMULATE USER ACTIVITY',  () => {
         });
         it('/ it should check limit Success', async () => {
             await request(server)
-                .post('/api/answer').send({body: 'Test'})
+                .post('/api/answer')
+                .set({ authorization: `Bearer ${token}`})
+                .send({body: 'Test'})
                 .then(async (res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
                     await request(server)
-                        .post('/api/answer').send({body: 'Test 2'}).then(
+                        .post('/api/answer')
+                        .set({ authorization: `Bearer ${token}`})
+                        .send({body: 'Test 2'}).then(
                             async (resB) => {
                                 await request(server)
                                     .get('/api/answer')
+                                    .set({ authorization: `Bearer ${token}`})
                                     .then(async (res) => {
                                         res.should.have.status(200);
                                         res.body.rows.should.be.a('array');
                                         res.body.rows.length.should.be.eql(2);
                                         await request(server)
                                             .get('/api/answer?limit=1')
+                                            .set({ authorization: `Bearer ${token}`})
                                             .then((res) => {
                                                 res.should.have.status(200);
                                                 res.body.rows.should.be.a('array');
