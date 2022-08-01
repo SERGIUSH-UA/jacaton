@@ -1,4 +1,4 @@
-require('dotenv').config({path:'../sec_mail.env'});
+require('dotenv').config({path:'./secure/.env'});
 const nodeMailer = require('nodemailer')
 
 class MailService {
@@ -10,7 +10,7 @@ class MailService {
             secure:false,
             auth: {
                 user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS
+                pass: process.env.SMTP_PASSWORD
             }
         })
     }

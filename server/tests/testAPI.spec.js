@@ -8,6 +8,7 @@ const {Answer, User, Question, Team, Game} = require("../models/models");
 const path = require("path");
 const jwt = require("jsonwebtoken");
 let expect = chai.expect;
+let should = chai.should();
 let adminToken = ''
 chai.use(chaiHttp);
 

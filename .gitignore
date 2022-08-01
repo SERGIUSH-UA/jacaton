@@ -1,6 +1,4 @@
 # Project exclude paths
 /server/node_modules/
 /server/static/
-/server/.env
-/server/tests/.env
-/server/sec_mail.env
+/server/secure/.env
