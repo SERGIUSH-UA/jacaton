@@ -342,7 +342,8 @@ describe('SIMULATE USER ACTIVITY',  () => {
                     res.should.not.status(200);
                     res.body.should.be.a('object');
                     res.body.message.should.be.a('string');
-                    res.body.message.should.be.eql('Логін або пароль пусті!');
+                    res.body.message.should.be.eql('Помилка при валідації');
+                    res.body.errors.should.be.a('array');
                 }).catch((e) => {throw e});
         });
         it('REGISTRATION check Success', async () => {

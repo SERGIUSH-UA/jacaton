@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const uuid = require("uuid");
 const tokenService = require("../service/token-service");
 const mailService = require("../service/mail-service");
+const {validationResult} = require("express-validator");
 
 class UserService {
 
