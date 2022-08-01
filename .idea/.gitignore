@@ -7,3 +7,5 @@
 /dataSources/
 /dataSources.local.xml
 /server/sec_mail.env
+/server/.env
+/server/tests/.env
