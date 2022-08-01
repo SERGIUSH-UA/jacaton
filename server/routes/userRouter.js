@@ -9,4 +9,5 @@ router.post('/login', userController.login)
 router.get('/auth', authMiddleware, userController.checkAuth)
 router.delete('/del/:id', checkRole('ADMIN'), userController.delete)
 router.patch('/role', checkRole('ADMIN'), userController.updateRoles)
+router.get('/activation/:link', userController.activation)
 module.exports = router

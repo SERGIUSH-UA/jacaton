@@ -97,7 +97,7 @@ describe('Global /API',  () => {
         });
         it('/REGISTRATION it should POST check Success', async () => {
             await request(server)
-                .post('/api/user/registration').send({email:'testin@g.com',
+                .post('/api/user/registration').send({email:'admin@g.com',
                     password:"1234321", role: 'user'})
                 .then((res) => {
                     res.should.have.status(200);
@@ -107,7 +107,7 @@ describe('Global /API',  () => {
         });
         it('/LOGIN it should POST check Success', async () => {
             await request(server)
-                .post('/api/user/login').send({email:'testin@g.com',
+                .post('/api/user/login').send({email:'admin@g.com',
                     password:"1234321"})
                 .then((res) => {
                     res.should.have.status(200);
@@ -118,9 +118,9 @@ describe('Global /API',  () => {
                     adminToken = res.body.token
                 }).catch((e) => {throw e});
         });
-        it('/AUTH?id=1 it should GET check Success', async () => {
+        it('/AUTH it should GET check Success', async () => {
             await request(server)
-                .get('/api/user/auth?id=5').set({ authorization: `Bearer ${token}`})
+                .get('/api/user/auth').set({ authorization: `Bearer ${token}`})
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
@@ -337,7 +337,7 @@ describe('SIMULATE USER ACTIVITY',  () => {
         const request =  chai.request;
         it('REGISTRATION check Error', async () => {
             await request(server)
-                .post('/api/user/registration').send({email:'test@g.com'})
+                .post('/api/user/registration').send({email:'alter.ego.sgr@gmail.com'})
                 .then((res) => {
                     res.should.not.status(200);
                     res.body.should.be.a('object');
@@ -347,7 +347,7 @@ describe('SIMULATE USER ACTIVITY',  () => {
         });
         it('REGISTRATION check Success', async () => {
             await request(server)
-                .post('/api/user/registration').send({email:'test@g.com',
+                .post('/api/user/registration').send({email:'alter.ego.sgr@gmail.com',
                     password:"1234321", role: 'user'})
                 .then((res) => {
                     res.should.have.status(200);
@@ -366,7 +366,7 @@ describe('SIMULATE USER ACTIVITY',  () => {
         });
         it('/LOGIN it should POST check Wrong Password', async () => {
             await request(server)
-                .post('/api/user/login').send({email:"test@g.com", password:"1111"})
+                .post('/api/user/login').send({email:"alter.ego.sgr@gmail.com", password:"1111"})
                 .then((res) => {
                     res.should.not.status(200);
                     res.body.should.be.a('object');
@@ -375,7 +375,7 @@ describe('SIMULATE USER ACTIVITY',  () => {
         });
         it('/LOGIN it should POST check Success', async () => {
             await request(server)
-                .post('/api/user/login').send({email:"test@g.com", password:"1234321"})
+                .post('/api/user/login').send({email:"alter.ego.sgr@gmail.com", password:"1234321"})
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
@@ -396,6 +396,28 @@ describe('SIMULATE USER ACTIVITY',  () => {
                     res.body.token.should.not.empty;
                 }).catch((e) => {throw e});
         });
+        it('/ACTIVATION it should GET check ERROR', async () => {
+            await request(server)
+                .get(`/api/user/activation/412fdsfisduf7335sdc`).set({authorization: `Bearer ${token}`})
+                .then((res) => {
+                    res.should.not.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.message.should.be.a('string');
+                    res.body.message.should.be.eql('Даний лінк не дійсний!');
+                }).catch((e) => {throw e});
+        });
+        it('/ACTIVATION it should GET check Success', async () => {
+            const user = await User.findByPk(userID)
+            user.isActivated.should.be.eql(false)
+            await request(server)
+                .get(`/api/user/activation/${user.activationLink}`).set({authorization: `Bearer ${token}`})
+                .redirects(0)
+                .then((res) => {
+                    res.should.have.status(302);
+                }).catch((e) => {throw e});
+            const updatedUser = await User.findByPk(userID)
+            updatedUser.isActivated.should.be.eql(true)
+        });
         it('/ROLE it should PATCH Add role check Success', async () => {
             await request(server)
                 .patch('/api/user/role')
@@ -410,7 +432,7 @@ describe('SIMULATE USER ACTIVITY',  () => {
         });
         it('/LOGIN (Re-login) it should POST check Success', async () => {
             await request(server)
-                .post('/api/user/login').send({email:"test@g.com", password:"1234321"})
+                .post('/api/user/login').send({email:"alter.ego.sgr@gmail.com", password:"1234321"})
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');

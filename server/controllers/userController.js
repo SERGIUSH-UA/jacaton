@@ -43,6 +43,16 @@ class UserController {
         }
     }
 
+    async activation(req, res, next) {
+        const link = req.params.link
+        try{
+            await userService.activation(link)
+            return res.redirect(process.env.CLIENT_URL)
+        } catch (e) {
+            return next(ApiError.internal(e.message))
+        }
+    }
+
     async delete(req, res) {
         res.status(200).json({message: true})
     }

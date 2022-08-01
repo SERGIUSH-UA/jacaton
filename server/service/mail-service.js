@@ -16,7 +16,18 @@ class MailService {
     }
 
     async sendActivationMail(to, link) {
-
+        await this.transporter.sendMail({
+            from: `"Францисканська Молодь в Україні" <${process.env.SMTP_USER}>`,
+            to, subject: `Активація аккаунта для гри "${process.env.GAME_NAME}"`,
+            text:'',
+            html:`
+            <div>
+                <h1>Вітаю, Вас! Для активації перейдіть за посиланням</h1>
+                <a href="${link}">${link}</a>
+                <p></p>
+            </div>
+            `
+        })
     }
 }
 
