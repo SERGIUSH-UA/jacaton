@@ -1,3 +1,4 @@
+require('dotenv').config({path:'../sec_mail.env'});
 const nodeMailer = require('nodemailer')
 
 class MailService {

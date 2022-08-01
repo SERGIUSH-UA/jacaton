@@ -3,3 +3,4 @@
 /server/static/
 /server/.env
 /server/tests/.env
+/server/sec_mail.env
