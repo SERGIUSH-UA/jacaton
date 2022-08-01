@@ -7,10 +7,8 @@ let server = require('../index');
 const {Answer, User, Question, Team, Game} = require("../models/models");
 const path = require("path");
 const jwt = require("jsonwebtoken");
-let should = chai.should();
 let expect = chai.expect;
 let adminToken = ''
-let userToken = ''
 chai.use(chaiHttp);
 
 console.log('API tests starting....')
@@ -343,6 +341,7 @@ describe('SIMULATE USER ACTIVITY',  () => {
                     res.should.not.status(200);
                     res.body.should.be.a('object');
                     res.body.message.should.be.a('string');
+                    res.body.message.should.be.eql('Логін або пароль пусті!');
                 }).catch((e) => {throw e});
         });
         it('REGISTRATION check Success', async () => {
@@ -404,8 +403,8 @@ describe('SIMULATE USER ACTIVITY',  () => {
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
-                    res.body.role.should.be.a('string');
-                    res.body.role.should.not.empty;
+                    res.body.roles.should.be.a('string');
+                    res.body.roles.should.not.empty;
                 }).catch((e) => {throw e});
         });
         it('/LOGIN (Re-login) it should POST check Success', async () => {

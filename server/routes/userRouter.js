@@ -8,5 +8,5 @@ router.post('/registration', userController.registration)
 router.post('/login', userController.login)
 router.get('/auth', authMiddleware, userController.checkAuth)
 router.delete('/del/:id', checkRole('ADMIN'), userController.delete)
-router.patch('/role', checkRole('ADMIN'), userController.updateRole)
+router.patch('/role', checkRole('ADMIN'), userController.updateRoles)
 module.exports = router

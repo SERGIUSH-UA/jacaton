@@ -9,7 +9,9 @@ const User = sequelize.define('user', {
     role: {type: DataTypes.STRING, defaultValue: 'USER'},
     city: {type: DataTypes.STRING, allowNull: true},
     img: {type: DataTypes.STRING, allowNull: true},
-    uuid: {type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4}
+    uuid: {type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4},
+    isActivated: {type: DataTypes.BOOLEAN, defaultValue: false},
+    activationLink: {type: DataTypes.STRING, allowNull: false},
 })
 
 const Team = sequelize.define('team', {
