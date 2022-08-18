@@ -1,0 +1,42 @@
+@import "../styles/vars";
+.bg-image-vertical {
+  position: relative;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: auto 100%;
+}
+
+@media (min-width: 1025px) {
+  .h-custom-2 {
+    height: 100%;
+  }
+}
+
+.login-page {
+  background-color: black;
+  -webkit-filter: sepia(25%);
+  filter: sepia(25%);
+}
+
+.form-login {
+  background-color: rgba(124, 124, 124, 0.93);
+  padding: 40px;
+}
+
+.input-white {
+  color: white;
+  text-decoration-color: white;
+}
+
+
+.register-link {
+  transition: .3s all ease;
+  color: $secondaryB;
+  &:hover, &:focus {
+    text-decoration: underline !important;
+    outline: none !important;
+    box-shadow: none;
+  }
+}
+

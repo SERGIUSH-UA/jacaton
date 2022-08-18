@@ -1,0 +1,24 @@
+.trans-input {
+  background: rgba(14, 60, 126, 0.06) !important;
+  transition: height 1s;
+  -webkit-transition: height 1s;
+  caret-color: white;
+  color: white;
+}
+.trans-input:active .trans-input:focus {
+  background: rgba(14, 60, 126, 0.06) !important;
+  color: white !important;
+}
+.trans-input::placeholder {
+  color: rgba(255, 255, 224, 0.42) !important;
+}
+
+.trans-input:-webkit-autofill,
+.trans-input:-webkit-autofill:hover,
+.trans-input:-webkit-autofill:focus,
+.trans-input:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
+  -webkit-text-fill-color: white !important;
+}
+
+/*# sourceMappingURL=TransparentInput.style.css.map */

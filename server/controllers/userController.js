@@ -30,7 +30,12 @@ class UserController {
     async checkAuth(req, res, next) {
         try {
             const token = await userService.checkAuth(req.user.id, req.user.email, req.user.role)
-            res.status(200).json({token})
+            if (token) {
+                const user = await userService.getByID(req.user.id);
+                res.status(200).json(user)}
+            else {
+                res.status(401).json({message: 'Помилка авторизації токену. Перезайдіть!'})
+            }
         }
         catch (e) {
             next(e)

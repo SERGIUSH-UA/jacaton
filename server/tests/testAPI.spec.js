@@ -124,8 +124,7 @@ describe('Global /API',  () => {
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
-                    res.body.token.should.be.a('string');
-                    res.body.token.should.not.empty;
+                    res.body.id.should.be.a('number');
                 }).catch((e) => {throw e});
         });
     });
@@ -393,8 +392,7 @@ describe('SIMULATE USER ACTIVITY',  () => {
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
-                    res.body.token.should.be.a('string');
-                    res.body.token.should.not.empty;
+                    res.body.id.should.be.a('number');
                 }).catch((e) => {throw e});
         });
         it('/ACTIVATION it should GET check ERROR', async () => {

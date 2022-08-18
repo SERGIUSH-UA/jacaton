@@ -99,6 +99,16 @@ class UserService {
             throw ApiError.internal(e.message)
         }
     };
+
+    getByID = async (id) => {
+        try {
+            const user = await User.findByPk(id, {attributes: {exclude: ['password']}});
+            return user;
+        }
+        catch (e) {
+            throw ApiError.internal(e.message)
+        }
+    }
 }
 
 module.exports = new UserService();
