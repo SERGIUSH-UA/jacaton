@@ -103,6 +103,9 @@ class UserService {
     getByID = async (id) => {
         try {
             const user = await User.findByPk(id, {attributes: {exclude: ['password']}});
+            if (user?.img === '') {
+                user.img = 'no-image-icon.png';
+            }
             return user;
         }
         catch (e) {

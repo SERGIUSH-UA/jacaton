@@ -11,11 +11,11 @@ const NavBar = () => {
     return (
         <Navbar bg="primary"  variant="dark" className='paper__border'>
             <Container>
-                <Navbar.Brand href="#home">{process.env.REACT_APP_WEBSITE_NAME}</Navbar.Brand>
+                <Navbar.Brand href={Routs.MAIN}>{process.env.REACT_APP_WEBSITE_NAME}</Navbar.Brand>
                 <Nav className="me-auto">
                     <Nav.Link href={Routs.MAIN}>Головна</Nav.Link>
-                    <Nav.Link href={Routs.LOGIN}>Команди</Nav.Link>
-                    <Nav.Link href={Routs.REGISTRATION}>Профіль</Nav.Link>
+                    <Nav.Link href={Routs.TEAMS}>Команди</Nav.Link>
+                    <Nav.Link href={Routs.PROFILE}>Профіль</Nav.Link>
                 </Nav>
                 {!user.id ?
                     <PaperButton addInkAnimation={true} buttonText='Увійти' onClick={() => navigate(Routs.LOGIN)}/>

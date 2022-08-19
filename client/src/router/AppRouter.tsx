@@ -1,13 +1,14 @@
 import React, {useEffect} from 'react';
-import { skipToken } from '@reduxjs/toolkit/query/react'
+import {skipToken} from '@reduxjs/toolkit/query/react'
 import {useAppDispatch, useAppSelector} from "../hooks/redux";
 import {userSlice} from "../store/reducers/UserSlice";
 import {userAPI} from "../services/user.service";
-import {Navigate, Routes, Route} from "react-router-dom";
+import {Navigate, Route, Routes} from "react-router-dom";
 import Routs from "./index";
 import Login from "../pages/login";
 import Registration from "../pages/registration";
 import Main from "../pages/main";
+import Profile from "../pages/profile";
 
 const AppRouter = () => {
 
@@ -45,7 +46,8 @@ const AppRouter = () => {
                 <Route path={Routs.LOGIN} element={<Login/>}/>
                 <Route path={Routs.REGISTRATION} element={<Registration/>}/>
                 <Route path={Routs.MAIN} element={<Main/>}/>
-                <Route path={'*'} element={<Navigate to="/" replace={true} />}/>
+                <Route path={Routs.PROFILE} element={<Profile/>}/>
+                <Route path={'*'} element={<Navigate to="/" replace={true}/>}/>
             </Routes>
         </div>
     );

@@ -5,6 +5,7 @@
 @import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap");
 @import url("https://fonts.googleapis.com/css?family=Neucha:300,400,500,700&display=swap");
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 //////CUSTOM STYLE
 
 $theme-colors: (
@@ -37,5 +38,31 @@ h1, h2, h3, h4, h5,
   border-bottom-right-radius: 225px 15px;
   border-top-left-radius: 255px 15px;
   border-top-right-radius: 15px 225px;
+  margin: 3px;
+}
+
+.paper__border__v2 {
+  border-radius: 15px 225px 255px 25px 25px 275px 235px 25px;
+  border-style: solid;
+  border-width: 2px;
+  box-shadow: rgba(0, 0, 0, .2) 15px 28px 25px -18px;
+  box-sizing: border-box;
+  border-bottom-left-radius: 25px 275px;
+  border-bottom-right-radius: 275px 25px;
+  border-top-left-radius: 275px 25px;
+  border-top-right-radius: 25px 245px;
+  margin: 3px;
+}
+
+.paper__border__v3 {
+  border-radius: 45px 125px 155px 45px 45px 175px 135px 45px;
+  border-style: solid;
+  border-width: 2px;
+  box-shadow: rgba(0, 0, 0, .2) 15px 28px 25px -18px;
+  box-sizing: border-box;
+  border-bottom-left-radius: 45px 175px;
+  border-bottom-right-radius: 175px 45px;
+  border-top-left-radius: 175px 45px;
+  border-top-right-radius: 45px 145px;
   margin: 3px;
 }

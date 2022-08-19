@@ -1,4 +1,0 @@
-# Project exclude paths
-/server/node_modules/
-/server/static/
-/server/secure/.env

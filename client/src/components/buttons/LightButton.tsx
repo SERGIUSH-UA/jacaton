@@ -1,6 +1,6 @@
 import React from 'react';
 import {Button} from "react-bootstrap";
-import './LightButton.style.scss'
+import '../../styles/components/LightButton.style.scss'
 
 const LightButton = ({className = '', ...props}) => {
     className = className + 'light__button';

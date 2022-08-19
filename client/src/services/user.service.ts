@@ -1,8 +1,6 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
 import {IToken, IUser, IUserAuth, IUserRegister} from "../models/IUser";
-import {useAppSelector} from "../hooks/redux";
 import {RootState} from "../store/store";
-
 
 
 export const userAPI = createApi({

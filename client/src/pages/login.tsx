@@ -1,14 +1,14 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Button, Col, Container, Form, NavLink, Row} from "react-bootstrap";
+import {Col, Container, Form, NavLink, Row} from "react-bootstrap";
 import Routs from "../router";
 import {useNavigate} from "react-router-dom";
-import './login.style.scss'
+import '../styles/pages/login.style.scss'
 import TransparentInput from "../components/inputs/TransparentInput";
 import PaperButton from "../components/buttons/PaperButton";
 import {userAPI} from "../services/user.service";
 import {userSlice} from "../store/reducers/UserSlice";
 import {useAppDispatch} from "../hooks/redux";
-import {IUserAuth, IUserRegister} from "../models/IUser";
+import {IUserAuth} from "../models/IUser";
 
 const Login = () => {
 

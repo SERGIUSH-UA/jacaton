@@ -3,12 +3,14 @@ const {DataTypes} = require('sequelize')
 
 const User = sequelize.define('user', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    email: {type: DataTypes.STRING, unique:true},
+    email: {type: DataTypes.STRING, unique: true},
     name: {type: DataTypes.STRING, allowNull: false},
-    password: {type: DataTypes.STRING, unique:false, allowNull: false},
+    password: {type: DataTypes.STRING, unique: false, allowNull: false},
     role: {type: DataTypes.STRING, defaultValue: 'USER'},
-    city: {type: DataTypes.STRING, allowNull: true},
-    img: {type: DataTypes.STRING, allowNull: true},
+    city: {type: DataTypes.STRING, defaultValue: '', allowNull: true},
+    parish: {type: DataTypes.STRING, defaultValue: '', allowNull: true},
+    bio: {type: DataTypes.STRING, defaultValue: '', allowNull: true},
+    img: {type: DataTypes.STRING, defaultValue: 'no-image-icon.png', allowNull: true},
     uuid: {type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4},
     isActivated: {type: DataTypes.BOOLEAN, defaultValue: false},
     activationLink: {type: DataTypes.STRING, allowNull: false},
@@ -17,9 +19,9 @@ const User = sequelize.define('user', {
 const Team = sequelize.define('team', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING, unique: true, allowNull: false},
-    city: {type: DataTypes.STRING, allowNull: true},
-    parish: {type: DataTypes.STRING, allowNull: true},
-    img: {type: DataTypes.STRING, allowNull: true}
+    city: {type: DataTypes.STRING, defaultValue: '', allowNull: true},
+    parish: {type: DataTypes.STRING, defaultValue: '', allowNull: true},
+    img: {type: DataTypes.STRING, defaultValue: 'team-def.webp', allowNull: true}
 })
 
 const Game = sequelize.define('game', {

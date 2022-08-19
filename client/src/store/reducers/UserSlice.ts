@@ -10,9 +10,12 @@ interface UserState {
 }
 
 const initialState: UserState = {
-    user: {id: 0, email: '', name: ''},
-    isLoading:false,
-    error:'',
+    user: {
+        id: 0, email: '', name: '', role: '', city: '', img: 'no-image-icon.png',
+        isActivated: false, teamId: 0, bio: '', parish: ''
+    },
+    isLoading: false,
+    error: '',
     auth: false,
     token: ''
 }

@@ -1,11 +1,15 @@
 import React from 'react';
-import './PaperButton.style.scss'
+import '../../styles/components/PaperButton.style.scss'
 
-const PaperButton = ({className = '', buttonText = '', addInkAnimation = false, ...props}) => {
+
+const PaperButton = ({
+                         className = '', buttonText = '', addInkAnimation = false,
+                         element = <div/>, ...props
+                     }) => {
 
     className += ' paper__button';
 
-    if(addInkAnimation) {
+    if (addInkAnimation) {
         className += ' paper__button__ink';
     }
 
@@ -14,6 +18,7 @@ const PaperButton = ({className = '', buttonText = '', addInkAnimation = false, 
 
         <button className={className} {...props}>
             {buttonText}
+            {element}
         </button>
     );
 };
