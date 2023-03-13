@@ -14,8 +14,6 @@ const PaperButton = ({
     }
 
     return (
-
-
         <button className={className} {...props}>
             {buttonText}
             {element}

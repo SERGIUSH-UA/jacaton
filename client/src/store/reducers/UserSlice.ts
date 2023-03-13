@@ -9,6 +9,11 @@ interface UserState {
     token: string;
 }
 
+interface IChangeUserValue {
+    field: string;
+    value: string | number;
+}
+
 const initialState: UserState = {
     user: {
         id: 0, email: '', name: '', role: '', city: '', img: 'no-image-icon.png',
@@ -23,15 +28,19 @@ const initialState: UserState = {
 export const userSlice = createSlice({
     name: 'user',
     initialState,
-    reducers:{
-        setUser(state, action: PayloadAction<IUser>){
+    reducers: {
+        setUser(state, action: PayloadAction<IUser>) {
             state.user = action.payload;
-            if(state.user.id){
+            if (state.user.id) {
                 state.auth = true;
                 state.isLoading = false;
             }
         },
-        setToken(state, action: PayloadAction<string>){
+        setUserValue(state, action: PayloadAction<IChangeUserValue>) {
+            const payload = action.payload;
+            // state.user = {...state.user, ...payload.};
+        },
+        setToken(state, action: PayloadAction<string>) {
             state.token = action.payload;
             state.auth = true;
         },

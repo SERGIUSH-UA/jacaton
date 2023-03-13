@@ -4,6 +4,7 @@ import {Col, Container, Row} from "react-bootstrap";
 import PaperButton from "../buttons/PaperButton";
 import * as Icon from 'react-bootstrap-icons';
 import {useAppSelector} from "../../hooks/redux";
+import EditProfile from "../editors/EditProfile";
 
 const ProfileCard = () => {
 
@@ -47,9 +48,8 @@ const ProfileCard = () => {
                             </ul>
                             {user.id !== 0 && <div className="buttons">
                                 <PaperButton buttonText='Знайти/створити команду'
-                                             className="w-25 btn btn-outline-primary px-4"/>
-                                <PaperButton buttonText={'Редагувати '} element={<Icon.PencilFill/>}
-                                             className="w-25 btn btn-primary px-4 ms-3"/>
+                                             className="w-25 btn btn-outline-primary px-2"/>
+                                <EditProfile spanClassName='ms-4' className="w-25 btn btn-outline-primary px-2"/>
                             </div>}
                         </div>
                     </div>
