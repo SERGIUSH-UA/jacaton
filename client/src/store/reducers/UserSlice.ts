@@ -1,5 +1,6 @@
 import {IUser} from "../../models/IUser";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {updateProp} from "../../helpers/main.helpers";
 
 interface UserState {
     user: IUser;
@@ -10,8 +11,9 @@ interface UserState {
 }
 
 interface IChangeUserValue {
-    field: string;
-    value: string | number;
+    field: 'name' | 'id' | 'email' | 'role' | 'city' | 'img' |
+        'isActivated' | 'teamId' | 'bio' | 'parish';
+    value: string | number | boolean;
 }
 
 const initialState: UserState = {
@@ -38,7 +40,7 @@ export const userSlice = createSlice({
         },
         setUserValue(state, action: PayloadAction<IChangeUserValue>) {
             const payload = action.payload;
-            // state.user = {...state.user, ...payload.};
+            updateProp(state.user, payload.field, payload.value);
         },
         setToken(state, action: PayloadAction<string>) {
             state.token = action.payload;
@@ -49,5 +51,6 @@ export const userSlice = createSlice({
         }
     }
 })
+
 
 export default userSlice.reducer;

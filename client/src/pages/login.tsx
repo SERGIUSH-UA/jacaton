@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Col, Container, Form, NavLink, Row} from "react-bootstrap";
+import {Col, Container, Form, NavLink, Row, Toast, ToastContainer} from "react-bootstrap";
 import Routs from "../router";
 import {useNavigate} from "react-router-dom";
 import '../styles/pages/login.style.scss'
@@ -9,6 +9,7 @@ import {userAPI} from "../services/user.service";
 import {userSlice} from "../store/reducers/UserSlice";
 import {useAppDispatch} from "../hooks/redux";
 import {IUserAuth} from "../models/IUser";
+import {isErrorWithMessage} from "../helpers/main.helpers";
 
 const Login = () => {
 
@@ -17,13 +18,23 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const [authUser,{data: token, error}] = userAPI.useLoginMutation();
+    const [authUser, {data: token, error}] = userAPI.useLoginMutation();
+
+    const [errorMessage, setErrorMessage] = useState('');
+    const [openAlert, setOpenAlert] = React.useState(false);
+    const handleCloseAlert = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpenAlert(false);
+        setErrorMessage('');
+    };
 
     const {setToken} = userSlice.actions;
     const dispatch = useAppDispatch();
 
-    useEffect(()=> {
-        if(token?.token){
+    useEffect(() => {
+        if (token?.token) {
             localStorage.setItem('TOKEN', token.token);
             dispatch(setToken(token.token));
             navigate(Routs.MAIN);
@@ -31,10 +42,21 @@ const Login = () => {
     }, [token])
 
     useEffect(() => {
-        if(error){
+        if(error) {
             if ('data' in error) {
-                console.log(JSON.stringify(error.data));
-            }}
+                if (typeof error.data === 'object' &&
+                    error.data != null &&
+                    "message" in error.data &&
+                    typeof error.data.message === "string") {
+                    setErrorMessage(error.data.message);
+                } else {
+                    setErrorMessage(JSON.stringify(error.data));
+                }
+            } else if (isErrorWithMessage(error)) {
+                setErrorMessage(error.message);
+            }
+            setOpenAlert(true);
+        }
     }, [error]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,6 +124,16 @@ const Login = () => {
 
                 </Form>
             </Row>
+            <ToastContainer className="p-2" position='top-end'>
+                <Toast bg={'danger'} onClose={handleCloseAlert} show={openAlert} animation={true}
+                       delay={3000} autohide>
+                    <Toast.Header>
+                        <strong className="me-auto">Помилка</strong>
+                        <small></small>
+                    </Toast.Header>
+                    <Toast.Body> {errorMessage}</Toast.Body>
+                </Toast>
+            </ToastContainer>
         </Container>
     );
 };

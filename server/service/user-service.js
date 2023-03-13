@@ -28,12 +28,12 @@ class UserService {
         return userRoles.includes(role)
     }
 
-    registration = async (email, password, next) => {
-        if (!email || !password){
+    registration = async (email, password, name, next) => {
+        if (!email || !password) {
             throw ApiError.badRequest('Логін або пароль пусті!')
         }
-        const candidate = await User.findOne({where:{email}})
-        if (candidate){
+        const candidate = await User.findOne({where: {email}})
+        if (candidate) {
             throw ApiError.badRequest('Користувач з таким емейлом існує!')
         }
         const hashPassword = await bcrypt.hash(password, 5)
@@ -43,7 +43,7 @@ class UserService {
         if(users.length === 0){
             role = 'USER;CAPTAIN;ADMIN'
         }
-        const user = await User.create({email, role, password: hashPassword, name: activationLink, activationLink})
+        const user = await User.create({email, role, password: hashPassword, name, activationLink})
         await mailService.sendActivationMail(email, `${process.env.API_URL}/api/user/activation/${activationLink}`)
         return tokenService.generateJWT(user.id, user.email, user.role)
      }
@@ -77,13 +77,31 @@ class UserService {
         }
     }
 
+
+    edit = async (userID, user) => {
+        try {
+            let findUser;
+            if (userID) {
+                findUser = await User.findByPk(userID)
+            } else {
+                throw ApiError.internal(`User not found ${userID}`);
+            }
+            const myFields = ['email', 'name', 'city', 'parish', 'bio', 'img'];
+
+            await findUser.update(user, {fields: myFields})
+            return findUser;
+        } catch (e) {
+            throw ApiError.internal(e.message)
+        }
+    }
+
     activation = async (activationLink) => {
-        try{
-           const user = await User.findOne({where:{activationLink, isActivated:false}})
-            if (!user){
+        try {
+            const user = await User.findOne({where: {activationLink, isActivated: false}})
+            if (!user) {
                 throw ApiError.badRequest('Даний лінк не дійсний!')
             }
-            user.set({isActivated:true})
+            user.set({isActivated: true})
             await user.save()
             return tokenService.generateJWT(user.id, user.email, user.role)
         } catch (e) {

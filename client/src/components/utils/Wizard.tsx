@@ -10,10 +10,11 @@ export interface WizardSection {
 
 interface WizardProps {
     sections: WizardSection[];
-    acceptClick: () => void;
+    acceptClick: (e: React.MouseEvent<HTMLFormElement>) => void;
+    refForm: React.RefObject<HTMLFormElement>;
 }
 
-export const Wizard: FC<WizardProps> = ({sections, acceptClick}) => {
+export const Wizard: FC<WizardProps> = ({sections, acceptClick, refForm}) => {
 
     const [currentSection, setCurrentSection] = useState(0);
 
@@ -28,7 +29,7 @@ export const Wizard: FC<WizardProps> = ({sections, acceptClick}) => {
 
     return (
         <Container fluid>
-            <Form onSubmit={(e) => e.preventDefault()}>
+            <Form ref={refForm} onSubmit={(e) => e.preventDefault()}>
                 {sections.map((section, index) =>
                     <section key={index}>{index === currentSection && section.element}</section>
                 )}
@@ -48,8 +49,8 @@ export const Wizard: FC<WizardProps> = ({sections, acceptClick}) => {
                             buttonText="Підтвердити"
                             // className='btn-outline-secondary'
                             style={{background: '#FFE656'}}
-                            onClick={() => acceptClick()}
-                            element={<ArrowBarRight/>}/>}
+                            onClick={(e: React.MouseEvent<HTMLFormElement>) => acceptClick(e)}
+                        />}
                     </Col>
                 </Row>
             </Form>
